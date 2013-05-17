@@ -340,7 +340,7 @@ UsedLibrary="/home/laneboysrc/projects/rc-winch-controller/electronics/Fairchild
 
 [Win_1]
 Type="Control Panel"
-Loc="-2 25 1677 1025"
+Loc="270 151 1410 970"
 State=2
 Number=0
 
