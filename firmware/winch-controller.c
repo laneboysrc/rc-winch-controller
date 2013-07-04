@@ -3,7 +3,15 @@
 extern void Init_input(void);
 extern void Read_input(void);
 
-unsigned char winch_mode = 0;
+enum {
+    WINCH_MODE_UNINITIALIZED = 0,
+    WINCH_MODE_OFF = 0x30,
+    WINCH_MODE_IDLE = 0x31,
+    WINCH_MODE_IN = 0x32,
+    WINCH_MODE_OUT = 0x33
+} winch_mode = WINCH_MODE_UNINITIALIZED;
+
+unsigned char old_winch_mode = WINCH_MODE_UNINITIALIZED;
 
 void Init_hardware(void) {
     //-----------------------------
@@ -23,12 +31,32 @@ void Init_hardware(void) {
     T1CON = 0b00100000; 
 }
 
+void Process_winch(void) {
+    if (winch_mode != old_winch_mode) {
+        switch(winch_mode) {
+        case WINCH_MODE_OFF:
+            break;
+        case WINCH_MODE_IDLE:
+            break;
+        case WINCH_MODE_IN:
+            break;
+        case WINCH_MODE_OUT:
+            break;
+        default:
+            break;
+        }
+
+        old_winch_mode = winch_mode;
+    }
+}
+
 void main(void) {
     Init_hardware();
     Init_input();
     
     while (1) {
         Read_input();
+        Process_winch();
     }
 }
 
