@@ -23,4 +23,5 @@ clean :
 	$(RM) *.map
 	$(RM) *.cod
 	$(RM) *.o
+	$(RM) *.asm
 	
