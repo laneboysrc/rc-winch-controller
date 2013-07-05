@@ -1,5 +1,16 @@
 #include <pic12f1840.h>
 
+/*
+
+RA0/ICSPDAT = High side left
+RA1/ICSPCLK = High side right
+RA2 = Low side right
+RA3/Vpp goes to ICSP
+RA4 = Low side left
+RA5/RX = Servo/UART Input
+
+ */
+
 extern void Init_input(void);
 extern void Read_input(void);
 
