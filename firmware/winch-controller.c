@@ -11,9 +11,9 @@ enum {
     WINCH_MODE_OUT = 0x33
 } winch_mode = WINCH_MODE_UNINITIALIZED;
 
-unsigned char old_winch_mode = WINCH_MODE_UNINITIALIZED;
+static unsigned char old_winch_mode = WINCH_MODE_UNINITIALIZED;
 
-void Init_hardware(void) {
+static void Init_hardware(void) {
     //-----------------------------
     // Clock initialization
     OSCCON = 0b01111010;    // 4x PLL disabled, 16 MHz HF, Internal oscillator
@@ -31,7 +31,7 @@ void Init_hardware(void) {
     T1CON = 0b00100000; 
 }
 
-void Process_winch(void) {
+static void Process_winch(void) {
     if (winch_mode != old_winch_mode) {
         switch(winch_mode) {
         case WINCH_MODE_OFF:
