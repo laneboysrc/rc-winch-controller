@@ -4,12 +4,23 @@
 
 RA0/ICSPDAT = High side left
 RA1/ICSPCLK = High side right
-RA2 = Low side right
+RA2/CCP1  = Low side right (CCP1 for music!)
 RA3/Vpp goes to ICSP
 RA4 = Low side left
 RA5/RX = Servo/UART Input
 
+Music that the controller makes:
+- Startup sound
+- Off to idle transition
+- Idle to off transition
+
  */
+
+#define MOTOR_OFF   0b00000000
+#define MOTOR_BRAKE 0b00010100
+#define MOTOR_IN    0b00000101
+#define MOTOR_OUT   0b00010010
+
 
 extern void Init_input(void);
 extern void Read_input(void);
@@ -34,8 +45,8 @@ static void Init_hardware(void) {
     PORTA = 0;
     LATA = 0;
     ANSELA = 0;
-    TRISA = 0b11111111;     // Make all ports A input
-    APFCON = 0b00000000;    // Use RA0/RA1 for UART TX/RX
+    TRISA = 0b11101000;     // Make all ports that are not used for the motor input
+    APFCON = 0b10000000;    // Use RA0/RA5 for UART TX/RX, CCP1 or RA2
     
     //-----------------------------
     // Initialize Timer1 for 1 MHz operation
@@ -46,14 +57,19 @@ static void Process_winch(void) {
     if (winch_mode != old_winch_mode) {
         switch(winch_mode) {
         case WINCH_MODE_OFF:
+            LATA = MOTOR_OFF;
             break;
         case WINCH_MODE_IDLE:
+            LATA = MOTOR_BRAKE;
             break;
         case WINCH_MODE_IN:
+            LATA = MOTOR_IN;
             break;
         case WINCH_MODE_OUT:
+            LATA = MOTOR_OUT;
             break;
         default:
+            LATA = MOTOR_OFF;
             break;
         }
 
