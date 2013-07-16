@@ -1,13 +1,18 @@
 #include <pic12f1840.h>
+#include <stdint.h>
+
+static __code uint16_t __at (_CONFIG1) configword1 = _FOSC_INTOSC & _WDTE_OFF & _PWRTE_ON & _MCLRE_OFF & _CP_OFF & _CPD_OFF & _BOREN_OFF & _CLKOUTEN_OFF & _IESO_OFF & _FCMEN_OFF;
+static __code uint16_t __at (_CONFIG2) configword2 = _WRT_OFF & _PLLEN_OFF & _STVREN_OFF & _LVP_OFF; 
+
 
 /*
 
-RA0/ICSPDAT = High side left
-RA1/ICSPCLK = High side right
-RA2/CCP1  = Low side right (CCP1 for music!)
-RA3/Vpp goes to ICSP
-RA4 = Low side left
-RA5/RX = Servo/UART Input
+Pin 7   RA0/ICSPDAT = High side left
+Pin 6   RA1/ICSPCLK = High side right
+Pin 5   RA2/CCP1  = Low side right (CCP1 for music!)
+Pin 4   RA3/Vpp goes to ICSP
+Pin 3   RA4 = Low side left
+Pin 2   RA5/RX = Servo/UART Input
 
 Music that the controller makes:
 - Startup sound
@@ -35,6 +40,18 @@ enum {
 
 static unsigned char old_winch_mode = WINCH_MODE_UNINITIALIZED;
 
+void Intr(void) __interrupt 0
+{
+//    T0IF = 0; /* Clear timer interrupt */
+    CCP1IF = 0;
+    if (LATA2)
+        LATA2 = 0;
+    else
+        LATA2 = 1;
+    
+}
+
+
 static void Init_hardware(void) {
     //-----------------------------
     // Clock initialization
@@ -46,11 +63,22 @@ static void Init_hardware(void) {
     LATA = 0;
     ANSELA = 0;
     TRISA = 0b11101000;     // Make all ports that are not used for the motor input
-    APFCON = 0b10000000;    // Use RA0/RA5 for UART TX/RX, CCP1 or RA2
+    APFCON = 0b10000000;    // Use RA0/RA5 for UART TX/RX, CCP1 on RA2
     
     //-----------------------------
     // Initialize Timer1 for 1 MHz operation
     T1CON = 0b00100000; 
+
+    CCPR1H = 1136 >> 8;
+    CCPR1L = 1136 & 0xff;
+    CCP1CON = 0b00001011; // Compare mode: special event trigger
+    
+    TMR1ON = 1;
+    CCP1IE = 1;
+    PEIE = 1;
+    GIE = 1;
+
+
 }
 
 static void Process_winch(void) {
@@ -142,11 +170,21 @@ static void Process_winch(void) {
 
 void main(void) {
     Init_hardware();
-    Init_input();
+//    Init_input();
     
     while (1) {
-        Read_input();
-        Process_winch();
+        LATA0 = 1;
+        LATA1 = 1;
+        //LATA2 = 1;
+        LATA4 = 1;
+        
+        LATA0 = 0;
+        LATA1 = 0;
+        //LATA2 = 0;
+        LATA4 = 0;
+        
+        //Read_input();
+        //Process_winch();
     }
 }
 
