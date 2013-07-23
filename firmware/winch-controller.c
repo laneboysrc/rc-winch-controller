@@ -168,11 +168,87 @@ static void Process_winch(void) {
     
 */
 
+#define C3 0
+#define D3 1
+#define E3 2
+#define F3 3
+#define G3 4
+#define A3 5
+#define B3 6
+#define C4 7
+#define D4 8
+#define E4 9
+#define F4 10
+#define G4 11
+#define A4 12
+#define B4 13
+#define C5 14
+
+#define F_C3 130.81
+#define F_D3 146.83
+#define F_E3 164.81
+#define F_F3 174.61
+#define F_G3 196.00
+#define F_A3 220.00
+#define F_B3 246.94
+#define F_C4 261.63
+#define F_D4 293.66
+#define F_E4 329.63
+#define F_F4 349.23
+#define F_G4 392.00
+#define F_A4 440.00
+#define F_B4 493.88
+#define F_C5 523.25
+
+
+__code unsigned char notes_high[] = {
+    ((unsigned int) (500000 / F_C3)) >> 8,
+    ((unsigned int) (500000 / F_D3)) >> 8,
+    ((unsigned int) (500000 / F_E3)) >> 8,
+    ((unsigned int) (500000 / F_F3)) >> 8,
+    ((unsigned int) (500000 / F_G3)) >> 8,
+    ((unsigned int) (500000 / F_A3)) >> 8,
+    ((unsigned int) (500000 / F_B3)) >> 8,
+    ((unsigned int) (500000 / F_C4)) >> 8,
+    ((unsigned int) (500000 / F_D4)) >> 8,
+    ((unsigned int) (500000 / F_E4)) >> 8,
+    ((unsigned int) (500000 / F_F4)) >> 8,
+    ((unsigned int) (500000 / F_G4)) >> 8,
+    ((unsigned int) (500000 / F_A4)) >> 8,
+    ((unsigned int) (500000 / F_B4)) >> 8,
+    ((unsigned int) (500000 / F_C5)) >> 8
+};
+
+__code unsigned char notes_low[] = {
+    ((unsigned int) (500000 / F_C3)),
+    ((unsigned int) (500000 / F_D3)),
+    ((unsigned int) (500000 / F_E3)),
+    ((unsigned int) (500000 / F_F3)),
+    ((unsigned int) (500000 / F_G3)),
+    ((unsigned int) (500000 / F_A3)),
+    ((unsigned int) (500000 / F_B3)),
+    ((unsigned int) (500000 / F_C4)),
+    ((unsigned int) (500000 / F_D4)),
+    ((unsigned int) (500000 / F_E4)),
+    ((unsigned int) (500000 / F_F4)),
+    ((unsigned int) (500000 / F_G4)),
+    ((unsigned int) (500000 / F_A4)),
+    ((unsigned int) (500000 / F_B4)),
+    ((unsigned int) (500000 / F_C5))
+};
+
+
 void main(void) {
     Init_hardware();
 //    Init_input();
     
     while (1) {
+        CCPR1H = notes_high[G3];
+        CCPR1L = notes_low[G3];
+        
+        // Note duration in 16 us units
+        old_winch_mode =  (notes_high[G3] << 4) + (notes_low[G3] >> 4);
+        
         LATA0 = 1;
         LATA1 = 1;
         //LATA2 = 1;
@@ -187,4 +263,7 @@ void main(void) {
         //Process_winch();
     }
 }
+
+
+
 
