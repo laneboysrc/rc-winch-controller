@@ -9,8 +9,7 @@ extern unsigned char winch_mode;
 
 
 void Init_input(void) {
-	TRISA1 = 1;     // RX port must be 1 for UART to work
-	TRISA2 = 1;     // TX port must be 1 for UART to work
+	TRISA1 = 1;             // RX port must be 1 for UART to work
 
 	SPBRG = SPBRG_VALUE;	// Baud Rate register, calculated by macro
 	BRGH = BRGH_VALUE;
@@ -22,9 +21,23 @@ void Init_input(void) {
 }
 
 void Read_input(void) {
-	while (!RCIF) {
-	    ;	            // Wait until data recieved
-    }
+	do {
+	    // Overflow error?
+	    // Yes: toggle CREN and flush the receive register to clear the overflow
+	    if (OERR) {
+	        CREN = 0;
+            WREG = RCREG;	
+            WREG = RCREG;	
+            WREG = RCREG;	
+	        CREN = 1;
+	    }
+
+	    // Frame error?
+	    // Yes: read the receive register to clear the error
+	    if (FERR) {
+            WREG = RCREG;	
+	    }
+	} while (!RCIF);    // Wait until valid character received
 	    
     winch_mode = RCREG;	
 }
