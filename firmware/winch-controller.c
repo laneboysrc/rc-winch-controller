@@ -119,24 +119,6 @@ static void Process_winch(void) {
     octave) and have a table that has pre-calculated timer values for 
     the reqired frequency.
     
-    The idea is to use the hardware CCP1 as PWM output with the given duty
-    cycle and frequency. For PWM we need to use Timer2.
-    However, at 16Mhz Timer2 can not generate low enough frequencies.
-
-
-    
-    Another idea is to use the modulator. Timer 2 would generate a PWM of 25% at
-    8 kHz. This 8 kHz would be switched on/off through the modulator at
-    the frequency of the sound, using Timer1 presumably. This way of sound 
-    generation was observed from the HobbyKing brushed ESC. 
-   
-    Timer1 is counting up. So we need to preload TMR1H:TMR1L with half the
-    desired frequency, and load it in a shadow register accessible 
-    from the interrupt.
-    Every interrup we toggle the modulator and reload TMR1H:TMR1L
-
-    We can also  use Timer1 to do the duration timing.
-    
     130.81 Hz (C3) -> 7645 us period = 3823 us half period
     440 Hz (A4) -> 2273 us period = 1136 us half period
     2093 Hz (C7) -> 478 us period = 239 us half period
@@ -151,20 +133,16 @@ static void Process_winch(void) {
     
     If we use Timer1 for music we will not be able to output music at the
     same time as measuring a servo pulse. This should not pose an issue
-    if the songs we play are short.
-  
-  
+    if the songs we play are short, and we can make the software stop while
+    the songs are playing.
     
-    We also could use Timer1 and CCP1 in compare mode. The output pin would
-    toggle on match. We need an interrupt to reset the Timer1 so that
-    the next period starts again.
-    Also tone / pause duration can be calculated in the same way as above.
-    This sounds like it is the simplest method, so let's try that first...
+    We use Timer1 and CCP1 in compare mode. CCP1 is set-up to trigger
+    an interrupt on match and reset the counter. We toggle the output 
+    in the interrup routine.
 
-    We should run Timer1 with a 1 us clock.    
-    For every note we need the 16 bit compare value. We need to also have
-    the 16us based increment value (We could calculate that one out of the
-    compare value, but a table approach may be simpler).
+    We run Timer1 with a 1 us clock. For every note we need the 16 bit compare 
+    value. We need to also have the 16us based increment value, which
+    we can easily calculate out of the compare value (divide by 16 is ">> 4").
     
 */
 
@@ -176,8 +154,7 @@ static void Process_winch(void) {
 #define A3 5
 #define B3 6
 #define C4 7
-#define D4 8
-#define E4 9
+#define D4 8#define E4 9
 #define F4 10
 #define G4 11
 #define A4 12
