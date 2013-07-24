@@ -384,6 +384,8 @@ void main(void) {
     Init_hardware();
     Init_input();
 
+    Read_input();
+
     Play_song(SONG_STARTUP);
     
     while (1) {
