@@ -40,10 +40,10 @@ the reqired frequency.
 2093 Hz (C7) -> 478 us period = 239 us half period
 
 If we allow for 4..1020 ms tone / pause durations (8 bits with 4ms resolution) 
-we need to decrement the "tone counter" every 4ms. We can do that reasonably
-accurate by accumulating an 8 bit value with a 16us resolution. So at each
-interrupt we would add the number of "16us units" to our counter. If it 
-overflows we decrement the tone counter. This way we should be able to
+we need to decrement the "tone counter" every 4,096 ms. We can do that 
+reasonably accurate by accumulating an 8 bit value with a 16us resolution. 
+So at each interrupt we would add the number of "16us units" to our counter. 
+If it  overflows we decrement the tone counter. This way we should be able to
 account for reasonably accurate tone durations regardless of the 
 note frequency. 
 
@@ -83,6 +83,8 @@ we can easily calculate out of the compare value (divide by 16 is ">> 4").
 #define A4 12
 #define B4 13
 #define C5 14
+#define PAUSE 15
+#define SONG_END 0xff
 
 // Frequencies for each notes in Hz
 // Source: http://www.phy.mtu.edu/~suits/notefreqs.html
@@ -102,6 +104,11 @@ we can easily calculate out of the compare value (divide by 16 is ">> 4").
 #define F_B4 493.88
 #define F_C5 523.25
 
+#define T_PAUSE 0xFFF   // Use 4096us as compare value for pause
+
+#define SONG_STARTUP 0
+#define SONG_ACTIVATE 1
+#define SONG_DEACTIVATE 2
 
 extern void Init_input(void);
 extern void Read_input(void);
@@ -115,6 +122,12 @@ enum {
 } winch_mode = WINCH_MODE_UNINITIALIZED;
 
 static unsigned char old_winch_mode = WINCH_MODE_UNINITIALIZED;
+static volatile unsigned char note;
+static volatile unsigned char duration;
+static volatile unsigned char duration_increment;
+static volatile unsigned char duration_counter;
+static volatile unsigned char in_progress_flag;
+
 
 // Tables to look up the CCP1 compare values for a given note. High byte
 // and low byte have a separate table for simplicity sake.
@@ -133,7 +146,8 @@ __code unsigned char notes_high[] = {
     ((unsigned int) (500000 / F_G4)) >> 8,
     ((unsigned int) (500000 / F_A4)) >> 8,
     ((unsigned int) (500000 / F_B4)) >> 8,
-    ((unsigned int) (500000 / F_C5)) >> 8
+    ((unsigned int) (500000 / F_C5)) >> 8,
+    ((unsigned int) T_PAUSE) >> 8
 };
 
 __code unsigned char notes_low[] = {
@@ -151,22 +165,52 @@ __code unsigned char notes_low[] = {
     ((unsigned int) (500000 / F_G4)),
     ((unsigned int) (500000 / F_A4)),
     ((unsigned int) (500000 / F_B4)),
-    ((unsigned int) (500000 / F_C5))
+    ((unsigned int) (500000 / F_C5)),
+    ((unsigned int) T_PAUSE)
 };
 
 
-void Intr(void) __interrupt 0
-{
-//    T0IF = 0; /* Clear timer interrupt */
-    CCP1IF = 0;
-    if (LATA2)
-        LATA2 = 0;
-    else
-        LATA2 = 1;
-    
-}
+__code unsigned char song_startup[] = {
+    C4, 80000 / 4096,
+    A4, 80000 / 4096,
+    C4, 80000 / 4096,
+    A4, 80000 / 4096,
+    C4, 80000 / 4096,
+    A4, 80000 / 4096,
+    C4, 80000 / 4096,
+    SONG_END
+};
+
+__code unsigned char song_activate[] = {
+    C4, 80000 / 4096,
+    D4, 80000 / 4096,
+    E4, 80000 / 4096,
+    F4, 80000 / 4096,
+    G4, 80000 / 4096,
+    A4, 80000 / 4096,
+    B4, 80000 / 4096,
+    C5, 80000 / 4096,
+    SONG_END
+};
+
+__code unsigned char song_deactivate[] = {
+    C5, 80000 / 4096,
+    B4, 80000 / 4096,
+    A4, 80000 / 4096,
+    G4, 80000 / 4096,
+    F4, 80000 / 4096,
+    E4, 80000 / 4096,
+    D4, 80000 / 4096,
+    C4, 80000 / 4096,
+    SONG_END
+};
 
 
+/*****************************************************************************
+ Init_hardware()
+ 
+ Initializes all used peripherals of the PIC chip.
+ ****************************************************************************/
 static void Init_hardware(void) {
     //-----------------------------
     // Clock initialization
@@ -182,28 +226,116 @@ static void Init_hardware(void) {
     
     //-----------------------------
     // Initialize Timer1 for 1 MHz operation
+    // Compare mode: special event trigger
     T1CON = 0b00100000; 
+    CCP1CON = 0b00001011; 
 
-    CCPR1H = 1136 >> 8;
-    CCPR1L = 1136 & 0xff;
-    CCP1CON = 0b00001011; // Compare mode: special event trigger
-    
-    TMR1ON = 1;
-    CCP1IE = 1;
+    // Enable interrupts (though non specific is active at this point)
     PEIE = 1;
     GIE = 1;
-
-
 }
 
 
+/*****************************************************************************
+ Play_song()
+ 
+ Play a melody via the connected motor.
+ This function only returns after the song has finished completely.
+ 
+ A song is a sequence of notes and their duration. A special marker is used
+ to signify a pause of a certain duration, another special marker indicates
+ the end of the song. Songs are stored in ROM.
+ ****************************************************************************/
+void Play_song(unsigned char song) {
+    const unsigned char *song_ptr;
+
+    song_ptr = song_startup;
+    if (song == SONG_ACTIVATE)
+        song_ptr = song_activate;
+    if (song == SONG_DEACTIVATE)
+        song_ptr = song_deactivate;
+
+    // For each note in the song do ...
+    while (*song_ptr != SONG_END) {
+        // Load the note and its duration
+        note = *song_ptr++;
+        duration = *song_ptr++;
+
+        // Retrive the on/off duration for the requested note
+        CCPR1H = notes_high[note];
+        CCPR1L = notes_low[note];
+
+        // Calculate the 16 us units the on/off duration occupies so that
+        // we can use the note frequency to time duration as well
+        duration_increment =  (notes_high[note] << 4) + (notes_low[note] >> 4);
+
+        // Start the Timer1 and enable the interrupt handing the frequency.
+        in_progress_flag = 1;    
+        CCP1IE = 1;
+        TMR1ON = 1;
+
+        // Wait until the interrupt completed playing the current note        
+        while (in_progress_flag != 0) {
+            ; // wait ...
+        }
+    }
+}
+
+
+/*****************************************************************************
+ Intr()
+ 
+ Interrupt handler!
+
+ The interrupt handler is triggered by CCP1 in special event mode.
+ When the compare registers match the timer is reset and the interrupt is 
+ triggered. 
+ ****************************************************************************/
+void Intr(void) __interrupt 0
+{
+    CCP1IF = 0;
+
+    // Toggle the motor output unless we are dealing with a Pause    
+    if (note != PAUSE) {
+        if (LATA2)
+            LATA2 = 0;
+        else
+            LATA2 = 1;
+    }
+
+    // Add the time of the note on/off period in 16 us units to a counter. 
+    // If the counter overflows (16 us * 256 = 4.096 ms) decrement the
+    // note duration. If the duration has reached zero we have finished
+    // playing the note (or pause), so  we terminate further interrupts
+    // and let the Play_song function know that we are finished.
+    duration_counter += duration_increment;
+    if (C != 0) {
+        --duration;
+        if (duration == 0) {
+            LATA2 = 0;
+            CCP1IE = 0;
+            TMR1ON = 0;
+            in_progress_flag = 0;                        
+        }
+    }    
+}
+
+
+/*****************************************************************************
+ Process_winch()
+ 
+ Turns the winch on/off depending on the requested winch mode, and play
+ songs if needed.
+ ****************************************************************************/
 static void Process_winch(void) {
     if (winch_mode != old_winch_mode) {
         switch(winch_mode) {
         case WINCH_MODE_OFF:
             LATA = MOTOR_OFF;
+            Play_song(SONG_DEACTIVATE);
             break;
         case WINCH_MODE_IDLE:
+            Play_song(SONG_ACTIVATE);
             LATA = MOTOR_BRAKE;
             break;
         case WINCH_MODE_IN:
@@ -222,21 +354,18 @@ static void Process_winch(void) {
 }
 
 
-void Play_song(unsigned char song) {
-    
-}
-
-
+/*****************************************************************************
+ main()
+ 
+ No introduction needed ... 
+ ****************************************************************************/
 void main(void) {
     Init_hardware();
 //    Init_input();
+
+    Play_song(SONG_STARTUP);
     
     while (1) {
-        CCPR1H = notes_high[G3];
-        CCPR1L = notes_low[G3];
-        
-        // Note duration in 16 us units
-        old_winch_mode =  (notes_high[G3] << 4) + (notes_low[G3] >> 4);
         
         LATA0 = 1;
         LATA1 = 1;
@@ -247,6 +376,9 @@ void main(void) {
         LATA1 = 0;
         //LATA2 = 0;
         LATA4 = 0;
+        
+        Play_song(SONG_ACTIVATE);
+        Play_song(SONG_DEACTIVATE);
         
         //Read_input();
         //Process_winch();
