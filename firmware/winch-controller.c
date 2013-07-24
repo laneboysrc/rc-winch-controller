@@ -172,12 +172,17 @@ __code unsigned char notes_low[] = {
 
 __code unsigned char song_startup[] = {
     C4, 80000 / 4096,
+    PAUSE, 40000 / 4096,
+    F4, 80000 / 4096,
+    PAUSE, 40000 / 4096,
     A4, 80000 / 4096,
-    C4, 80000 / 4096,
+    PAUSE, 40000 / 4096,
+    C5, 160000 / 4096,
+    PAUSE, 40000 / 4096,
     A4, 80000 / 4096,
-    C4, 80000 / 4096,
-    A4, 80000 / 4096,
-    C4, 80000 / 4096,
+    PAUSE, 40000 / 4096,
+    C5, 240000 / 4096,
+    PAUSE, 500000 / 4096,
     SONG_END
 };
 
@@ -187,9 +192,15 @@ __code unsigned char song_activate[] = {
     E4, 80000 / 4096,
     F4, 80000 / 4096,
     G4, 80000 / 4096,
+    C4, 80000 / 4096,
+    D4, 80000 / 4096,
+    E4, 80000 / 4096,
+    F4, 80000 / 4096,
+    G4, 80000 / 4096,
     A4, 80000 / 4096,
     B4, 80000 / 4096,
-    C5, 80000 / 4096,
+    C5, 160000 / 4096,
+    PAUSE, 500000 / 4096,
     SONG_END
 };
 
@@ -199,9 +210,15 @@ __code unsigned char song_deactivate[] = {
     A4, 80000 / 4096,
     G4, 80000 / 4096,
     F4, 80000 / 4096,
+    C5, 80000 / 4096,
+    B4, 80000 / 4096,
+    A4, 80000 / 4096,
+    G4, 80000 / 4096,
+    F4, 80000 / 4096,
     E4, 80000 / 4096,
     D4, 80000 / 4096,
-    C4, 80000 / 4096,
+    C4, 240000 / 4096,
+    PAUSE, 500000 / 4096,
     SONG_END
 };
 
@@ -332,10 +349,14 @@ static void Process_winch(void) {
         switch(winch_mode) {
         case WINCH_MODE_OFF:
             LATA = MOTOR_OFF;
-            Play_song(SONG_DEACTIVATE);
+            if (old_winch_mode != WINCH_MODE_UNINITIALIZED) {
+                Play_song(SONG_DEACTIVATE);
+            }
             break;
         case WINCH_MODE_IDLE:
-            Play_song(SONG_ACTIVATE);
+            if (old_winch_mode == WINCH_MODE_OFF) {
+                Play_song(SONG_ACTIVATE);
+            }
             LATA = MOTOR_BRAKE;
             break;
         case WINCH_MODE_IN:
@@ -361,27 +382,13 @@ static void Process_winch(void) {
  ****************************************************************************/
 void main(void) {
     Init_hardware();
-//    Init_input();
+    Init_input();
 
     Play_song(SONG_STARTUP);
     
     while (1) {
-        
-        LATA0 = 1;
-        LATA1 = 1;
-        //LATA2 = 1;
-        LATA4 = 1;
-        
-        LATA0 = 0;
-        LATA1 = 0;
-        //LATA2 = 0;
-        LATA4 = 0;
-        
-        Play_song(SONG_ACTIVATE);
-        Play_song(SONG_DEACTIVATE);
-        
-        //Read_input();
-        //Process_winch();
+        Read_input();
+        Process_winch();
     }
 }
 
