@@ -182,7 +182,6 @@ __code unsigned char song_startup[] = {
     A4, 80000 / 4096,
     PAUSE, 40000 / 4096,
     C5, 240000 / 4096,
-    PAUSE, 500000 / 4096,
     SONG_END
 };
 
@@ -200,7 +199,6 @@ __code unsigned char song_activate[] = {
     A4, 80000 / 4096,
     B4, 80000 / 4096,
     C5, 160000 / 4096,
-    PAUSE, 500000 / 4096,
     SONG_END
 };
 
@@ -218,7 +216,6 @@ __code unsigned char song_deactivate[] = {
     E4, 80000 / 4096,
     D4, 80000 / 4096,
     C4, 240000 / 4096,
-    PAUSE, 500000 / 4096,
     SONG_END
 };
 
