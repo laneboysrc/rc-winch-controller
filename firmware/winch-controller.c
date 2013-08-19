@@ -127,6 +127,7 @@ static volatile unsigned char duration;
 static volatile unsigned char duration_increment;
 static volatile unsigned char duration_counter;
 static volatile unsigned char in_progress_flag;
+static volatile unsigned char note_output_flag;
 
 
 // Tables to look up the CCP1 compare values for a given note. High byte
@@ -311,10 +312,11 @@ void Intr(void) __interrupt 0
 
     // Toggle the motor output unless we are dealing with a Pause    
     if (note != PAUSE) {
-        if (LATA2)
-            LATA2 = 0;
+        ++note_output_flag;
+        if (note_output_flag & 0x01)
+            LATA = MOTOR_OFF;
         else
-            LATA2 = 1;
+            LATA = MOTOR_OUT;
     }
 
     // Add the time of the note on/off period in 16 us units to a counter. 
@@ -326,7 +328,7 @@ void Intr(void) __interrupt 0
     if (C != 0) {
         --duration;
         if (duration == 0) {
-            LATA2 = 0;
+            LATA = MOTOR_OFF;
             CCP1IE = 0;
             TMR1ON = 0;
             in_progress_flag = 0;                        
