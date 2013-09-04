@@ -9,8 +9,6 @@ extern unsigned char winch_mode;
 
 
 void Init_input(void) {
-	TRISA1 = 1;             // RX port must be 1 for UART to work
-
 	SPBRG = SPBRG_VALUE;	// Baud Rate register, calculated by macro
 	BRGH = BRGH_VALUE;
 
