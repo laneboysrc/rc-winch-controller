@@ -314,9 +314,12 @@ void Intr(void) __interrupt 0
     if (note != PAUSE) {
         ++note_output_flag;
         if (note_output_flag & 0x01)
-            LATA = MOTOR_OFF;
+            LATA = MOTOR_IN;
         else
             LATA = MOTOR_OUT;
+    }
+    else {
+        LATA = MOTOR_OFF;
     }
 
     // Add the time of the note on/off period in 16 us units to a counter. 
