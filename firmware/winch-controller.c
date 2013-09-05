@@ -386,7 +386,9 @@ void main(void) {
     Init_hardware();
     Init_input();
 
-    Read_input();
+    for (duration_counter = 0; duration_counter < 3 ; ++duration_counter) {
+        Read_input();
+    }
 
     Play_song(SONG_STARTUP);
     
