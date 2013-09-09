@@ -2,62 +2,72 @@
 
 extern unsigned char winch_mode;
 
+
+
 void Init_input(void) {
+/*
     movlw   1000 >> 4
     movwf   ch3_ep0
 
     movlw   2000 >> 4
     movwf   ch3_ep1
+*/
 }
 
 void Read_input(void) {
-Read_ch3
-    BANKSEL ch3_value
-    clrf    ch3_value       ; Prime the result with "timing measurement failed"
+    unsigned int ch3;
+    unsigned char ch3_state;
+    static unsigned char ch3_last_state;
+    
+    TMR1H = 0;
+    TMR1L = 0;
 
-    BANKSEL T1CON
-    bcf     T1CON, TMR1ON   ; Stop timer 1
-    clrf    TMR1H           ; Reset the timer to 0
-    clrf    TMR1L
+    // Wait until servo signal is LOW 
+    // This ensures that we do not start in the middle of a pulse
+    while (RA5 != 0) {
+        ; // wait ...
+    }
 
-    ; Wait until servo signal is LOW 
-    ; This ensures that we do not start in the middle of a pulse
-ch3_wait_for_low1
-    btfsc   PORT_CH3
-    goto    ch3_wait_for_low1
+    // Wait until servo signal is high; start of pulse
+    while (RA5 != 1) {
+        ; // wait ...
+    }
 
-ch3_wait_for_high
-    btfss   PORT_CH3    ; Wait until servo signal is high
-    goto    ch3_wait_for_high
+    TMR1ON = 1;         // Start the timer    
 
-    bsf     T1CON, TMR1ON   ; Start timer 1
+    // Wait until servo signal is LOW again; end of pulse
+    while (RA5 != 0) {
+        ; // wait ...
+    }
 
-ch3_wait_for_low2
-    btfsc   PORT_CH3    ; Wait until servo signal is LOW
-    goto    ch3_wait_for_low2
+    TMR1ON = 0;         // Stop the timer    
 
-    bcf     T1CON, TMR1ON   ; Stop timer 1
+    ch3 = (TMR1H << 8) | TMR1L;
 
-    call    Validate_servo_measurement
-  
-    ; Use the middle 12 bit as an 8 bit value since we don't need high
-    ; accuracy for the CH3 
-    rlf     xl, f
-    rlf     xh, f
-    rlf     xl, f
-    rlf     xh, f
-    rlf     xl, f
-    rlf     xh, f
-    rlf     xl, f
-    rlf     xh, f
+    if (ch3 < 600 || ch3 > 2500) {
+        return;
+    }
 
-    movf    xh, w    
-    BANKSEL ch3_value
-    movwf   ch3_value
+    ch3_state = ch3_last_state;    
+    if (ch3_last_state) {
+        if (ch3 < 1375) {
+            ch3_state = 0;
+        }    
+    }
+    else {
+        if (ch3 > 1625) {
+            ch3_state = 1;
+        }    
+    }
+
+    if (ch3_state != ch3_last_state) {
+        ch3_last_state = ch3_state;    
+    }     
 
     // winch_mode = RCREG;	
 }
 
+/*
 Process_ch3_double_click
 IFDEF ENABLE_GEARBOX
     BANKSEL gear_mode
@@ -161,4 +171,5 @@ process_ch3_winch_off
     movwf   ch3_click_counter
     return
 ENDIF
+*/
 
