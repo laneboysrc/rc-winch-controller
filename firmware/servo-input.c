@@ -20,7 +20,7 @@ static unsigned char ch3_click_counter = 0;
 
 // All units are in 32.768 ms resolution
 #define CH3_INITIALIZATION_TIMEOUT 90
-#define CH3_BUTTON_TIMEOUT 6
+#define CH3_BUTTON_TIMEOUT 12
 
 
 /*****************************************************************************
@@ -50,7 +50,7 @@ void Init_input(void) {
        of what we would like to have, so software has to adjust for it.
     */  
     PR2 = 0xff;
-    T2CON = 0b01111111;     //1:16 post scaler; timer on; Prescaler is 64
+    T2CON = 0b00111111;     // 1:8 post scaler; timer on; Prescaler is 64
 }
 
 
@@ -82,6 +82,7 @@ void Read_input(void) {
     // Read the CH3 servo input into the variable ch3 (time value in us)
     TMR1H = 0;
     TMR1L = 0;
+    CCP1CON = 0b00000000;   // Compare mode off
 
     // Wait until servo signal is LOW 
     // This ensures that we do not start in the middle of a pulse
@@ -108,7 +109,7 @@ void Read_input(void) {
     }
 
 
-    // Apply a schmitt-trigger function: If the servo input was "high" during
+    // Apply a hysteresis function: If the servo input was "high" during
     // the last valid measurement, the value must drop below 1375 us before it 
     // is considered "low". 
     // If it was "low" during the last measurement it must rise above 1625 us
@@ -165,6 +166,7 @@ void Read_input(void) {
     if (ch3_click_counter) {        // Double-click timer expired?
         return;                     // No: wait for more buttons
     }
+
 
     // Implement the business logic:
     // 5 clicks activate/deactivate the winch

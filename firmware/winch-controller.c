@@ -286,6 +286,7 @@ void Play_song(unsigned char song) {
 
         // Start the Timer1 and enable the interrupt handing the frequency.
         in_progress_flag = 1;    
+        CCP1CON = 0b00001011;   // Compare mode: special event trigger
         CCP1IE = 1;
         TMR1ON = 1;
 
