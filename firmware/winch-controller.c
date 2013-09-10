@@ -62,10 +62,10 @@ we can easily calculate out of the compare value (divide by 16 is ">> 4").
     
 */
 
-#define MOTOR_OFF   0b00000000
-#define MOTOR_BRAKE 0b00010100
-#define MOTOR_IN    0b00000101
-#define MOTOR_OUT   0b00010010
+#define MOTOR_OFF   0b00000000      // Motor ports are floating
+#define MOTOR_BRAKE 0b00010100      // Motor ports are shorted for brake function
+#define MOTOR_IN    0b00000101      // Direction for winching in
+#define MOTOR_OUT   0b00010010      // Direction for winching out
 
 // Enumeration for notes used in songs
 #define C3 0
@@ -311,6 +311,8 @@ void Intr(void) __interrupt 0
     CCP1IF = 0;
 
     // Toggle the motor output unless we are dealing with a Pause    
+    // Note that we must turn the motor foward/backwards to stay at its current
+    // position, otherwise it will spin in one direction
     if (note != PAUSE) {
         ++note_output_flag;
         if (note_output_flag & 0x01)
@@ -349,24 +351,29 @@ void Intr(void) __interrupt 0
 static void Process_winch(void) {
     if (winch_mode != old_winch_mode) {
         switch(winch_mode) {
+
         case WINCH_MODE_OFF:
             LATA = MOTOR_OFF;
             if (old_winch_mode != WINCH_MODE_UNINITIALIZED) {
                 Play_song(SONG_DEACTIVATE);
             }
             break;
+
         case WINCH_MODE_IDLE:
             if (old_winch_mode == WINCH_MODE_OFF) {
                 Play_song(SONG_ACTIVATE);
             }
             LATA = MOTOR_BRAKE;
             break;
+
         case WINCH_MODE_IN:
             LATA = MOTOR_IN;
             break;
+
         case WINCH_MODE_OUT:
             LATA = MOTOR_OUT;
             break;
+
         default:
             LATA = MOTOR_OFF;
             break;
@@ -386,6 +393,13 @@ void main(void) {
     Init_hardware();
     Init_input();
 
+    // In order to not draw power straight away after power-on we delay
+    // execution for 3 rounds of Read_input(). 
+    // This was originally designed for the UART reader, where the UART
+    // sender would send out commands once a second.
+    // Other readers need to implement a delay function in their Read_input()
+    // to achieve similar timings. WINCH_MODE_UNINITIALIZED could be used
+    // to determine whether such delay is necessary.
     for (duration_counter = 0; duration_counter < 3 ; ++duration_counter) {
         Read_input();
     }
@@ -397,7 +411,4 @@ void main(void) {
         Process_winch();
     }
 }
-
-
-
 
