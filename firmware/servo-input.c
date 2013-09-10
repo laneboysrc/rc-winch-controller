@@ -1,175 +1,193 @@
 #include <pic12f1840.h>
 
-extern unsigned char winch_mode;
+extern enum {
+    WINCH_MODE_UNINITIALIZED = 0,
+    WINCH_MODE_OFF = 0x30,
+    WINCH_MODE_IDLE = 0x31,
+    WINCH_MODE_IN = 0x32,
+    WINCH_MODE_OUT = 0x33
+} winch_mode;
+
+static struct {
+    unsigned ch3_initialized : 1;
+    unsigned ch3_state : 1;
+    unsigned ch3_last_state : 1;
+    unsigned ch3_transitioned : 1;
+} f = {0, 0, 0, 0};
+
+static unsigned char ch3_clicks = 0;
+static unsigned char ch3_click_counter = 0;
+
+// All units are in 32.768 ms resolution
+#define CH3_INITIALIZATION_TIMEOUT 90
+#define CH3_BUTTON_TIMEOUT 6
 
 
-
-void Init_input(void) {
-/*
-    movlw   1000 >> 4
-    movwf   ch3_ep0
-
-    movlw   2000 >> 4
-    movwf   ch3_ep1
-*/
+/*****************************************************************************
+ Service_soft_timer()
+ 
+ Soft timer with a resolution of 32.768ms
+ ****************************************************************************/
+static void Service_soft_timer(void) {
+    if (TMR2IF) {
+        TMR2IF = 0;
+        
+        // Decrement ch3_click_counter if it is running
+        if (ch3_click_counter) {
+            --ch3_click_counter;
+        }
+    }
 }
 
+
+/*****************************************************************************
+ Init_input()
+
+ Called once during start-up of the firmware. 
+ ****************************************************************************/
+void Init_input(void) {
+    /* Use Timer2 as soft timer with an interval of 32.768ms. This is half
+       of what we would like to have, so software has to adjust for it.
+    */  
+    PR2 = 0xff;
+    T2CON = 0b01111111;     //1:16 post scaler; timer on; Prescaler is 64
+}
+
+
+/*****************************************************************************
+ Read_input
+
+ Called once per mainloop to read the input signal.
+ This function shall set the global variable winch_mode depending on the  
+ state transition logic desired.
+ ****************************************************************************/
 void Read_input(void) {
     unsigned int ch3;
-    unsigned char ch3_state;
-    static unsigned char ch3_last_state;
-    
+
+    // If we are starting up delay this function for approx 3 seconds. 
+    // This way we don't energize the motor (music!) straight away during 
+    // power-up, causing spikes in the system while the power supply is still
+    // stabilizing.
+    if (winch_mode == WINCH_MODE_UNINITIALIZED) {
+        ch3_click_counter = CH3_INITIALIZATION_TIMEOUT;
+        while (ch3_click_counter) {
+            Service_soft_timer();
+        }
+    }
+
+    Service_soft_timer();
+
+
+    // ##################################
+    // Read the CH3 servo input into the variable ch3 (time value in us)
     TMR1H = 0;
     TMR1L = 0;
 
     // Wait until servo signal is LOW 
     // This ensures that we do not start in the middle of a pulse
-    while (RA5 != 0) {
-        ; // wait ...
-    }
+    while (RA5 != 0) ;
 
     // Wait until servo signal is high; start of pulse
-    while (RA5 != 1) {
-        ; // wait ...
-    }
+    while (RA5 != 1) ;
 
-    TMR1ON = 1;         // Start the timer    
+    // Start the time measurement
+    TMR1ON = 1;         
 
     // Wait until servo signal is LOW again; end of pulse
-    while (RA5 != 0) {
-        ; // wait ...
-    }
+    while (RA5 != 0) ;
 
-    TMR1ON = 0;         // Stop the timer    
+    // Start the time measurement
+    TMR1ON = 0;
 
+    // Check if the measured pulse time is between 600 and 2500 us. If it is
+    // outside we consider it an invalid servo pulse and stop further execution.
     ch3 = (TMR1H << 8) | TMR1L;
 
     if (ch3 < 600 || ch3 > 2500) {
         return;
     }
 
-    ch3_state = ch3_last_state;    
-    if (ch3_last_state) {
+
+    // Apply a schmitt-trigger function: If the servo input was "high" during
+    // the last valid measurement, the value must drop below 1375 us before it 
+    // is considered "low". 
+    // If it was "low" during the last measurement it must rise above 1625 us
+    // before it is considred "high" again.
+    // This assumes that the servo pulses are centered around 1500us.
+    if (f.ch3_last_state) {
         if (ch3 < 1375) {
-            ch3_state = 0;
+            f.ch3_state = 0;
         }    
+        else {
+            f.ch3_state = 1;
+        }
     }
     else {
         if (ch3 > 1625) {
-            ch3_state = 1;
+            f.ch3_state = 1;
         }    
+        else {
+            f.ch3_state = 0;
+        }
     }
 
-    if (ch3_state != ch3_last_state) {
-        ch3_last_state = ch3_state;    
+    // If it is the first measurement after power-up we save the value
+    // as initial value and consider the firmware initialized.
+    if (winch_mode == WINCH_MODE_UNINITIALIZED) {
+        f.ch3_last_state = f.ch3_state;    
+        winch_mode = WINCH_MODE_OFF;
+    }
+
+    // Determine whether CH3 has been toggled
+    f.ch3_transitioned = 0;
+    if (f.ch3_state != f.ch3_last_state) {
+        f.ch3_last_state = f.ch3_state;    
+        f.ch3_transitioned = 1;
     }     
 
-    // winch_mode = RCREG;	
+    // If CH3 has been toggled add a click and (re-) start the click timeout.
+    // If the winch is running turn it off straight away.
+    if (f.ch3_transitioned) {
+        ++ch3_clicks;        
+        ch3_click_counter = CH3_BUTTON_TIMEOUT;
+
+        if (winch_mode == WINCH_MODE_IN  ||  winch_mode == WINCH_MODE_OUT) {
+            winch_mode = WINCH_MODE_IDLE;
+            // Set an invalid clicks number to ignore multiple clicks
+            ch3_clicks = 99;        
+        }
+    }
+    
+    if (ch3_clicks == 0) {          // Any buttons pending?
+        return;                     // No: done
+    }
+
+    if (ch3_click_counter) {        // Double-click timer expired?
+        return;                     // No: wait for more buttons
+    }
+
+    // Implement the business logic:
+    // 5 clicks activate/deactivate the winch
+    // 1 click: winch in if winch is active
+    // 2 clicks: winch out if winch is active
+    if (ch3_clicks == 1) {
+        if (winch_mode == WINCH_MODE_IDLE) {
+            winch_mode = WINCH_MODE_IN;
+        }
+    }
+    if (ch3_clicks == 2) {
+        if (winch_mode == WINCH_MODE_IDLE) {
+            winch_mode = WINCH_MODE_OUT;
+        }
+    }
+    if (ch3_clicks == 5) {
+        if (winch_mode == WINCH_MODE_IDLE) {
+            winch_mode = WINCH_MODE_OFF;
+        }
+        else {
+            winch_mode = WINCH_MODE_IDLE;
+        }
+    }
+    ch3_clicks = 0;
 }
-
-/*
-Process_ch3_double_click
-IFDEF ENABLE_GEARBOX
-    BANKSEL gear_mode
-    bcf     gear_mode, GEAR_CHANGED_FLAG
-ENDIF    
-    BANKSEL startup_mode
-    movf    startup_mode, f
-    bz      process_ch3_no_startup
-    return
-
-process_ch3_no_startup
-    btfsc   flags, CH3_FLAG_INITIALIZED
-    goto    process_ch3_initialized
-
-    ; Ignore the potential "toggle" after power on
-    bsf     flags, CH3_FLAG_INITIALIZED
-    bcf     flags, CH3_FLAG_LAST_STATE
-    BANKSEL ch3
-    btfss   ch3, CH3_FLAG_LAST_STATE
-    return
-    BANKSEL flags               
-    bsf     flags, CH3_FLAG_LAST_STATE
-    return
-
-process_ch3_initialized
-    BANKSEL ch3
-    movfw   ch3
-    movwf   temp+1  
-
-    ; ch3 is only using bit 0, the same bit as CH3_FLAG_LAST_STATE.
-    ; We can therefore use XOR to determine whether ch3 has changed.
-   
-    BANKSEL flags               
-    xorwf   flags, w        
-    movwf   temp
-
-IFDEF CH3_MOMENTARY
-    ; -------------------------------------------------------    
-    ; Code for CH3 having a momentory signal when pressed (Futaba 4PL)
-
-    ; We only care about the switch transition from CH3_FLAG_LAST_STATE 
-    ; (set upon initialization) to the opposite position, which is when 
-    ; we add a click.
-    btfsc   temp, CH3_FLAG_LAST_STATE
-    goto    process_ch3_potential_click
-
-    ; ch3 is the same as CH3_FLAG_LAST_STATE (idle position), therefore reset 
-    ; our "transitioned" flag to detect the next transition.
-    bcf     flags, CH3_FLAG_TANSITIONED        
-    goto    process_ch3_click_timeout
-
-process_ch3_potential_click
-    ; Did we register this transition already?    
-    ;   Yes: check for click timeout.
-    ;   No: Register transition and add click
-    btfsc   flags, CH3_FLAG_TANSITIONED
-    goto    process_ch3_click_timeout
-
-    bsf     flags, CH3_FLAG_TANSITIONED
-    ;goto   process_ch3_add_click    
-
-ELSE
-    ; -------------------------------------------------------    
-    ; Code for CH3 being a two position switch (HK-310, GT3B)
-
-    ; Check whether ch3 has changed with respect to LAST_STATE
-    btfss   temp, CH3_FLAG_LAST_STATE
-    goto    process_ch3_click_timeout
-
-    bcf     flags, CH3_FLAG_LAST_STATE      ; Store the new ch3 state
-    btfsc   temp+1, CH3_FLAG_LAST_STATE     ; temp+1 contains ch3
-    bsf     flags, CH3_FLAG_LAST_STATE
-    ;goto   process_ch3_add_click    
-
-    ; -------------------------------------------------------    
-ENDIF
-
-process_ch3_add_click
-IFDEF ENABLE_WINCH
-    ; If the winch is running any movement of CH3 immediately turns off
-    ; the winch (without waiting for click timeout!)
-    BANKSEL winch_mode
-    movlw   WINCH_MODE_IN
-    subwf   winch_mode, w
-    bz      process_ch3_winch_off
-
-    movlw   WINCH_MODE_OUT
-    subwf   winch_mode, w
-    bnz     process_ch3_no_winch
-
-process_ch3_winch_off
-    movlw   WINCH_MODE_IDLE
-    movwf   winch_mode
-
-    ; Disable this series of clicks by setting the click count to an unused
-    ; high value
-    BANKSEL ch3_clicks               
-    movlw   99
-    movwf   ch3_clicks
-    movlw   CH3_BUTTON_TIMEOUT
-    movwf   ch3_click_counter
-    return
-ENDIF
-*/
 
