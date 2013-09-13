@@ -5,4 +5,5 @@
 *.lst
 *.cod
 *.hex
+!rc-winch-controller-servo.hex
 *.map
