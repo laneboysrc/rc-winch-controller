@@ -4,8 +4,10 @@ DIY controller an RC car winch
 This project is for a winch controller for Radio Controlled cars that uses
 channel 3 to operate the winch remotely.
 
-/YouTube/
-/Blog post/
+YouTube video: `http://youtu.be/_9bI9k0ff98 <http://youtu.be/_9bI9k0ff98/>`_
+/Blog post link to be posted.../
+
+`<iframe width="640" height="480" src="//www.youtube-nocookie.com/embed/_9bI9k0ff98" frameborder="0" allowfullscreen></iframe>`_
 
 
 Usage
