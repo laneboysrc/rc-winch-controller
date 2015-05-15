@@ -24,6 +24,8 @@ static uint8_t init_timer;
 #define INITIALIZATION_TIMEOUT 30
 
 
+#define SERVO_INPUT RA1
+
 /*****************************************************************************
  Service_soft_timer()
 
@@ -64,6 +66,7 @@ void Init_input(void) {
 void Read_input(void) {
     unsigned int ch3;
 
+
     // If we are starting up delay this function for approx 1 second.
     if (winch_mode == WINCH_MODE_UNINITIALIZED) {
         init_timer = INITIALIZATION_TIMEOUT;
@@ -82,16 +85,16 @@ void Read_input(void) {
 
     // Wait until servo signal is LOW
     // This ensures that we do not start in the middle of a pulse
-    while (RA1 != 0) ;
+    while (SERVO_INPUT != 0) ;
 
     // Wait until servo signal is high; start of pulse
-    while (RA1 != 1) ;
+    while (SERVO_INPUT != 1) ;
 
     // Start the time measurement
     TMR1ON = 1;
 
     // Wait until servo signal is LOW again; end of pulse
-    while (RA1 != 0) ;
+    while (SERVO_INPUT != 0) ;
 
     // Stop the time measurement
     TMR1ON = 0;

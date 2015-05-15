@@ -18,6 +18,8 @@ Pin 8   Vss             GND
 
 */
 
+#define SERVO_OUTPUT LATA0
+
 extern void Init_input(void);
 extern void Read_input(void);
 
@@ -50,13 +52,8 @@ static void Init_hardware(void) {
 
     //-----------------------------
     // Initialize Timer1 for 1 MHz operation
-    // Compare mode off
     T1CON = 0b00100000;
-    CCP1CON = 0b00000000;
-
-    // Enable interrupts (though non specific is active at this point)
-    PEIE = 1;
-    GIE = 1;
+    CCP1CON = 0b00000000;   // Compare mode off
 }
 
 
@@ -69,12 +66,12 @@ static void Init_hardware(void) {
 static void Process_winch(void) {
     switch(winch_mode) {
         case WINCH_MODE_IN:
-                CCPR1L = 1500;
-                CCPR1H = 1500 >> 8;
+                CCPR1L = 1000 & 0xff;
+                CCPR1H = 1000 >> 8;
             break;
 
         case WINCH_MODE_OUT:
-                CCPR1L = 2000;
+                CCPR1L = 2000 & 0xff;
                 CCPR1H = 2000 >> 8;
             break;
 
@@ -82,21 +79,23 @@ static void Process_winch(void) {
         case WINCH_MODE_OFF:
         case WINCH_MODE_OFF2:
         default:
-                CCPR1L = 1500;
+                CCPR1L = 1500 & 0xff;
                 CCPR1H = 1500 >> 8;
             break;
     }
 
-    TMR1H = 0;          // Start the timer from 0
+    TMR1H = 0;              // Start the timer from 0
     TMR1L = 0;
-    CCP1IF = 0;         // Clear the compare event flag
+    CCP1CON = 0b00001010;   // Enable compare match (CCP1IF bit is set, CCP1 pin unaffected)
+    CCP1IF = 0;             // Clear the compare event flag
 
-    TMR1ON = 1;         // Start timer 1
-    LATA0 = 1;          // Set servo output
-    while (!CCP1IF);    // Wait for compare value reached
-    LATA0 = 0;          // Clear servo output
+    TMR1ON = 1;             // Start timer 1
+    SERVO_OUTPUT = 1;
+    while (!CCP1IF);        // Wait for compare value reached
+    SERVO_OUTPUT = 0;
 
-    TMR1ON = 0;         // Stop timer 1
+    TMR1ON = 0;             // Stop timer 1
+    CCP1CON = 0b00000000;   // Compare mode off
 }
 
 
