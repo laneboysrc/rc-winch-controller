@@ -1,4 +1,4 @@
-.PHONY: all
+.PHONY: all clean program
 all: rc-winch-controller-3racing
 
 
@@ -15,7 +15,13 @@ rc-winch-controller-3racing.hex: winch-controller.o servo-input.o
 	sdcc --use-non-free -mpic14 -p12f1840 -c $<
 
 
-clean :
+#############################################################################
+program: rc-winch-controller-3racing.hex
+	pk2cmd -p pic12f1840 -m -f rc-winch-controller-3racing.hex -t
+
+
+#############################################################################
+clean:
 	$(RM) *.hex
 	$(RM) *.lst
 	$(RM) *.map
