@@ -1,0 +1,22 @@
+Part        Value              Package    Description
+=============================  ========================================================
+C1          1uF/16V            C1206K     CAPACITOR
+C2          1uF/16V            C1206K     CAPACITOR
+Q1          MMTB2222           SOT23      NPN TRANSISTOR
+Q2          MMTB2222           SOT23      NPN TRANSISTOR
+R1          4k7                R0603      RESISTOR
+R2          4k7                R0603      RESISTOR
+R3          4k7                R0603      RESISTOR
+R4          4k7                R0603      RESISTOR
+R5          47k                R0603      RESISTOR
+R6          47k                R0603      RESISTOR
+R7          4k7                R0603      RESISTOR
+R8          4k7                R0603      RESISTOR
+R9          0R                 R0603      RESISTOR
+SV1         SERVO/RX-IN                   PIN HEADER
+SV2         WINCH OUT                     PIN HEADER (optional)
+SV3         ICSP                          PIN HEADER (optional)
+T1          FDS9934            SO8        DUAL N AND P-CHANNEL ENHANCEMENT MODE MOSFET
+T2          FDS9934            SO8        DUAL N AND P-CHANNEL ENHANCEMENT MODE MOSFET
+U$1         MCP1702T-3302E/CB  SOT-23A
+U$2         PIC12F1840         SO8        Microchip PIC12F1840
