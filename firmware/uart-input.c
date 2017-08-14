@@ -7,11 +7,13 @@ extern unsigned char winch_mode;
 #define BRGH_VALUE 1            // Either 0 or 1
 #define SPBRG_VALUE (((10*FOSC*1000000/((64-(48*BRGH_VALUE))*BAUDRATE))+5)/10)-1
 
+unsigned char rx;
+
 
 /*****************************************************************************
  Init_input()
 
- Called once during start-up of the firmware. 
+ Called once during start-up of the firmware.
  ****************************************************************************/
 void Init_input(void) {
 	SPBRG = SPBRG_VALUE;	// Baud Rate register, calculated by macro
@@ -28,12 +30,12 @@ void Init_input(void) {
  Read_input
 
  Called once per mainloop to read the input signal.
- This function shall set the global variable winch_mode depending on the  
+ This function shall set the global variable winch_mode depending on the
  state transition logic desired.
  ****************************************************************************/
 void Read_input(void) {
     // Note that for the UART input the state transition logic is handled
-    // in whoever is sending the UART commands, the winch controller is 
+    // in whoever is sending the UART commands, the winch controller is
     // just setting winch_mode to whatever value comes in.
 
 	do {
@@ -41,19 +43,22 @@ void Read_input(void) {
 	    // Yes: toggle CREN and flush the receive register to clear the overflow
 	    if (OERR) {
 	        CREN = 0;
-            WREG = RCREG;	
-            WREG = RCREG;	
-            WREG = RCREG;	
+            WREG = RCREG;
+            WREG = RCREG;
+            WREG = RCREG;
 	        CREN = 1;
 	    }
 
 	    // Frame error?
 	    // Yes: read the receive register to clear the error
 	    if (FERR) {
-            WREG = RCREG;	
+            WREG = RCREG;
 	    }
 	} while (!RCIF);    // Wait until valid character received
-	    
-    winch_mode = RCREG;	
+
+    rx = RCREG;
+    if (rx >= 0x80  &&  rx <= 0x83) {
+        winch_mode = rx;
+    }
 }
 
