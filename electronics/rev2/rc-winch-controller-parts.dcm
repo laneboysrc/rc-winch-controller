@@ -1,0 +1,20 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP RX7899
+D Motor Driver, 25V, 3A
+K full-bridge h-bridge
+F http://www.allegromicro.com/~/media/Files/Datasheets/A4950-Datasheet.ashx
+$ENDCMP
+#
+$CMP RZ7889
+D Motor Driver, 15V, 3A
+K full-bridge h-bridge
+$ENDCMP
+#
+$CMP XINLIGHT_XL-2012RGBC
+D RGB LED, anode/red/green/blue
+K LED RGB diode
+F ~
+$ENDCMP
+#
+#End Doc Library

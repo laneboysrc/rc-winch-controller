@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name rc-winch-controller-footprints)(type KiCad)(uri ${KIPRJMOD}/rc-winch-controller-footprints.pretty)(options "")(descr ""))
+)

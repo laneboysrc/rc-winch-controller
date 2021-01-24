@@ -1,0 +1,506 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title "RC Winch Controller"
+Date "2021-01-24"
+Rev "Rev2"
+Comp "LANE Boys RC"
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L MCU_NXP_LPC:LPC812M001JDH16 U2
+U 1 1 600D3394
+P 4850 3550
+F 0 "U2" H 4950 4200 50  0000 C CNN
+F 1 "LPC812M001JDH16" H 5200 4100 50  0000 C CNN
+F 2 "Package_SO:TSSOP-16_4.4x5mm_P0.65mm" H 5800 4150 50  0001 C CNN
+F 3 "http://www.nxp.com/documents/data_sheet/LPC81XM.pdf" H 4850 3050 50  0001 C CNN
+	1    4850 3550
+	1    0    0    -1  
+$EndComp
+$Comp
+L rc-winch-controller-parts:XINLIGHT_XL-2012RGBC D2
+U 1 1 600D5353
+P 9000 5450
+F 0 "D2" H 9000 5947 50  0000 C CNN
+F 1 "LED_ARGB" H 9000 5856 50  0000 C CNN
+F 2 "rc-winch-controller-footprints:LED_RGB_XINGLIGHT_XL-2012RGBC" H 9000 5400 50  0001 C CNN
+F 3 "~" H 9000 5400 50  0001 C CNN
+	1    9000 5450
+	-1   0    0    1   
+$EndComp
+$Comp
+L Device:R_Pack04 RN1
+U 1 1 600D6E3D
+P 6700 5400
+F 0 "RN1" V 6283 5400 50  0000 C CNN
+F 1 "1K" V 6374 5400 50  0000 C CNN
+F 2 "Resistor_SMD:R_Array_Convex_4x0603" V 6975 5400 50  0001 C CNN
+F 3 "~" H 6700 5400 50  0001 C CNN
+	1    6700 5400
+	0    1    1    0   
+$EndComp
+$Comp
+L Switch:SW_Push SW1
+U 1 1 600D7F5F
+P 4600 6050
+F 0 "SW1" H 4600 6335 50  0000 C CNN
+F 1 "SETUP" H 4600 6244 50  0000 C CNN
+F 2 "rc-winch-controller-footprints:Tact switch 6x4x3" H 4600 6250 50  0001 C CNN
+F 3 "~" H 4600 6250 50  0001 C CNN
+	1    4600 6050
+	1    0    0    -1  
+$EndComp
+$Comp
+L Regulator_Linear:MCP1703A-3302_SOT23 U1
+U 1 1 600D921C
+P 2400 1500
+F 0 "U1" H 2400 1742 50  0000 C CNN
+F 1 "MCP1703A-3302_SOT23" H 2400 1651 50  0000 C CNN
+F 2 "Package_TO_SOT_SMD:SOT-23_Handsoldering" H 2400 1700 50  0001 C CNN
+F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/20005122B.pdf" H 2400 1450 50  0001 C CNN
+	1    2400 1500
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:CP C4
+U 1 1 600D9E9B
+P 8000 2800
+F 0 "C4" H 7882 2754 50  0000 R CNN
+F 1 "CP" H 7882 2845 50  0000 R CNN
+F 2 "Capacitor_THT:CP_Axial_L11.0mm_D6.0mm_P18.00mm_Horizontal" H 8038 2650 50  0001 C CNN
+F 3 "~" H 8000 2800 50  0001 C CNN
+	1    8000 2800
+	-1   0    0    1   
+$EndComp
+$Comp
+L Device:C C1
+U 1 1 600DD71A
+P 1750 1650
+F 0 "C1" H 1865 1696 50  0000 L CNN
+F 1 "1u" H 1865 1605 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder" H 1788 1500 50  0001 C CNN
+F 3 "~" H 1750 1650 50  0001 C CNN
+	1    1750 1650
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C2
+U 1 1 600DDBA2
+P 3050 1650
+F 0 "C2" H 3165 1696 50  0000 L CNN
+F 1 "10u" H 3165 1605 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder" H 3088 1500 50  0001 C CNN
+F 3 "~" H 3050 1650 50  0001 C CNN
+	1    3050 1650
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C3
+U 1 1 600DE885
+P 3450 1650
+F 0 "C3" H 3565 1696 50  0000 L CNN
+F 1 "100n" H 3565 1605 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder" H 3488 1500 50  0001 C CNN
+F 3 "~" H 3450 1650 50  0001 C CNN
+	1    3450 1650
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x06 J1
+U 1 1 600E6556
+P 1150 3250
+F 0 "J1" H 1068 2725 50  0000 C CNN
+F 1 "Conn_01x06" H 1068 2816 50  0000 C CNN
+F 2 "rc-winch-controller-footprints:PinHeader_1x06_P2.54mm_Flat" H 1150 3250 50  0001 C CNN
+F 3 "~" H 1150 3250 50  0001 C CNN
+	1    1150 3250
+	-1   0    0    1   
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x06 J2
+U 1 1 600E6D30
+P 9750 3150
+F 0 "J2" H 9668 2625 50  0000 C CNN
+F 1 "Conn_01x06" H 9668 2716 50  0000 C CNN
+F 2 "rc-winch-controller-footprints:PinHeader_1x06_P2.54mm_Flat" H 9750 3150 50  0001 C CNN
+F 3 "~" H 9750 3150 50  0001 C CNN
+	1    9750 3150
+	1    0    0    1   
+$EndComp
+Wire Wire Line
+	6500 5200 6050 5200
+Wire Wire Line
+	6050 5300 6350 5300
+Wire Wire Line
+	6900 5200 7450 5200
+Wire Wire Line
+	7450 5300 7000 5300
+Wire Wire Line
+	4150 3250 3600 3250
+Text Label 3600 3250 0    50   ~ 0
+ST-Rx
+Wire Wire Line
+	4150 3650 3600 3650
+Text Label 3600 3650 0    50   ~ 0
+Tx
+Wire Wire Line
+	5550 3750 6150 3750
+Text Label 6150 3750 2    50   ~ 0
+SW-ISP
+$Comp
+L power:GND #PWR07
+U 1 1 600ED009
+P 4850 4300
+F 0 "#PWR07" H 4850 4050 50  0001 C CNN
+F 1 "GND" H 4855 4127 50  0000 C CNN
+F 2 "" H 4850 4300 50  0001 C CNN
+F 3 "" H 4850 4300 50  0001 C CNN
+	1    4850 4300
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4850 4150 4850 4300
+$Comp
+L power:GND #PWR06
+U 1 1 600ED975
+P 4250 6200
+F 0 "#PWR06" H 4250 5950 50  0001 C CNN
+F 1 "GND" H 4255 6027 50  0000 C CNN
+F 2 "" H 4250 6200 50  0001 C CNN
+F 3 "" H 4250 6200 50  0001 C CNN
+	1    4250 6200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4400 6050 4250 6050
+Wire Wire Line
+	4250 6050 4250 6200
+Text Label 5400 6050 2    50   ~ 0
+SW-ISP
+Wire Wire Line
+	4800 6050 5400 6050
+Text Notes 2400 6150 0    50   ~ 0
+Special pins:\nPIO0_0  (19)   ISP UART RX\nPIO0_4  ( 5)   ISP UART TX\nPIO0_5  ( 4)   RESET\nPIO0_10 ( 9)   Open drain\nPIO0_11 ( 8)   Open drain\nPIO0_2  ( 7)   SWDIO\nPIO0_3  ( 6)   SWCLK
+Text Label 3600 3850 0    50   ~ 0
+FWD
+Text Label 5800 3250 0    50   ~ 0
+REV
+Wire Wire Line
+	7800 3250 7900 3250
+Text Label 8250 3250 0    50   ~ 0
+MOT1
+Text Label 8250 3450 0    50   ~ 0
+MOT2
+$Comp
+L power:GND #PWR010
+U 1 1 600F5EEF
+P 9100 3500
+F 0 "#PWR010" H 9100 3250 50  0001 C CNN
+F 1 "GND" H 9105 3327 50  0000 C CNN
+F 2 "" H 9100 3500 50  0001 C CNN
+F 3 "" H 9100 3500 50  0001 C CNN
+	1    9100 3500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9550 3050 9100 3050
+Wire Wire Line
+	9100 3050 9100 3500
+NoConn ~ 9550 3150
+Wire Wire Line
+	9550 2950 8800 2950
+Wire Wire Line
+	7400 2950 7400 3050
+Connection ~ 8000 2950
+Wire Wire Line
+	8000 2950 7400 2950
+$Comp
+L power:GND #PWR09
+U 1 1 600FB047
+P 8000 2550
+F 0 "#PWR09" H 8000 2300 50  0001 C CNN
+F 1 "GND" H 8005 2377 50  0000 C CNN
+F 2 "" H 8000 2550 50  0001 C CNN
+F 3 "" H 8000 2550 50  0001 C CNN
+	1    8000 2550
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	8000 2550 8000 2650
+$Comp
+L Device:D_Schottky_x2_KCom_AAK D1
+U 1 1 600FDC8F
+P 1750 950
+F 0 "D1" H 1750 1167 50  0000 C CNN
+F 1 "D_Schottky_x2_KCom_AAK" H 1750 1076 50  0000 C CNN
+F 2 "Package_TO_SOT_SMD:SOT-523" H 1750 950 50  0001 C CNN
+F 3 "~" H 1750 950 50  0001 C CNN
+	1    1750 950 
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1750 1150 1750 1500
+Wire Wire Line
+	1750 1500 2100 1500
+Wire Wire Line
+	2700 1500 3050 1500
+Wire Wire Line
+	4850 1500 4850 2950
+Connection ~ 3050 1500
+Wire Wire Line
+	3050 1500 3450 1500
+Connection ~ 3450 1500
+Wire Wire Line
+	3450 1500 4850 1500
+Connection ~ 1750 1500
+$Comp
+L power:GND #PWR05
+U 1 1 601073A3
+P 3450 1950
+F 0 "#PWR05" H 3450 1700 50  0001 C CNN
+F 1 "GND" H 3455 1777 50  0000 C CNN
+F 2 "" H 3450 1950 50  0001 C CNN
+F 3 "" H 3450 1950 50  0001 C CNN
+	1    3450 1950
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR04
+U 1 1 60107F19
+P 3050 1950
+F 0 "#PWR04" H 3050 1700 50  0001 C CNN
+F 1 "GND" H 3055 1777 50  0000 C CNN
+F 2 "" H 3050 1950 50  0001 C CNN
+F 3 "" H 3050 1950 50  0001 C CNN
+	1    3050 1950
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR02
+U 1 1 601081E2
+P 1750 1950
+F 0 "#PWR02" H 1750 1700 50  0001 C CNN
+F 1 "GND" H 1755 1777 50  0000 C CNN
+F 2 "" H 1750 1950 50  0001 C CNN
+F 3 "" H 1750 1950 50  0001 C CNN
+	1    1750 1950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1750 1800 1750 1950
+Wire Wire Line
+	3050 1800 3050 1950
+Wire Wire Line
+	3450 1800 3450 1950
+$Comp
+L power:GND #PWR03
+U 1 1 60109C8B
+P 2400 1950
+F 0 "#PWR03" H 2400 1700 50  0001 C CNN
+F 1 "GND" H 2405 1777 50  0000 C CNN
+F 2 "" H 2400 1950 50  0001 C CNN
+F 3 "" H 2400 1950 50  0001 C CNN
+	1    2400 1950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2400 1800 2400 1950
+$Comp
+L power:GND #PWR01
+U 1 1 6010C3C0
+P 1500 3550
+F 0 "#PWR01" H 1500 3300 50  0001 C CNN
+F 1 "GND" H 1505 3377 50  0000 C CNN
+F 2 "" H 1500 3550 50  0001 C CNN
+F 3 "" H 1500 3550 50  0001 C CNN
+	1    1500 3550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1350 3450 1500 3450
+Wire Wire Line
+	1500 3450 1500 3550
+Wire Wire Line
+	1350 3350 1950 3350
+Text Label 1950 3350 2    50   ~ 0
+VIN
+Wire Wire Line
+	1450 950  1100 950 
+Text Label 2850 950  2    50   ~ 0
+VIN
+Wire Wire Line
+	2050 950  2850 950 
+Text Label 1100 950  0    50   ~ 0
+VMOT
+Text Label 7500 2950 0    50   ~ 0
+VMOT
+Wire Wire Line
+	9550 2850 9150 2850
+Text Label 9150 2850 0    50   ~ 0
+VIN
+$Comp
+L power:GND #PWR08
+U 1 1 60114693
+P 7400 4050
+F 0 "#PWR08" H 7400 3800 50  0001 C CNN
+F 1 "GND" H 7405 3877 50  0000 C CNN
+F 2 "" H 7400 4050 50  0001 C CNN
+F 3 "" H 7400 4050 50  0001 C CNN
+	1    7400 4050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7400 3850 7400 3950
+Connection ~ 7400 3950
+Wire Wire Line
+	7400 3950 7400 4050
+Wire Wire Line
+	6900 5400 7000 5400
+Wire Wire Line
+	6500 5400 6350 5400
+Text Label 6050 5300 0    50   ~ 0
+LED-A
+Wire Wire Line
+	9200 5650 9600 5650
+Wire Wire Line
+	9600 5450 9200 5450
+Wire Wire Line
+	9600 5250 9200 5250
+Text Label 9600 5650 2    50   ~ 0
+LED-R
+Text Label 9600 5450 2    50   ~ 0
+LED-G
+Text Label 9600 5250 2    50   ~ 0
+LED-B
+NoConn ~ 5550 3550
+NoConn ~ 5550 3650
+Wire Wire Line
+	4150 3550 3600 3550
+Wire Wire Line
+	3600 3450 4150 3450
+Text Label 3600 3450 0    50   ~ 0
+LED-G
+Text Label 3600 3550 0    50   ~ 0
+LED-R
+Wire Wire Line
+	3600 3350 4150 3350
+Text Label 3600 3350 0    50   ~ 0
+LED-B
+Text Label 4200 1500 0    50   ~ 0
+VDD
+Text Label 7450 5300 2    50   ~ 0
+VDD
+Text Label 6050 5500 0    50   ~ 0
+ST-Rx-in
+Text Label 6050 5200 0    50   ~ 0
+Tx-in
+Text Label 7450 5500 2    50   ~ 0
+ST-Rx
+Text Label 7450 5200 2    50   ~ 0
+Tx
+Wire Wire Line
+	1950 3250 1350 3250
+Wire Wire Line
+	1950 3150 1350 3150
+Text Label 1950 3250 2    50   ~ 0
+ST-Rx-in
+Text Label 1950 3150 2    50   ~ 0
+Tx-in
+$Comp
+L Device:Polyfuse F1
+U 1 1 6014AA24
+P 8650 2950
+F 0 "F1" V 8425 2950 50  0000 C CNN
+F 1 "3A 16V 1812" V 8516 2950 50  0000 C CNN
+F 2 "Fuse:Fuse_1812_4532Metric_Pad1.30x3.40mm_HandSolder" H 8700 2750 50  0001 L CNN
+F 3 "~" H 8650 2950 50  0001 C CNN
+	1    8650 2950
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	8500 2950 8000 2950
+NoConn ~ 1350 3050
+Text Label 9150 2950 0    50   ~ 0
+VMOT-in
+Text Notes 5800 5750 0    50   ~ 0
+2x 1k in parallel to get detect LED current
+NoConn ~ 1350 2950
+Wire Wire Line
+	7800 3350 7900 3350
+Wire Wire Line
+	7900 3350 7900 3250
+Wire Wire Line
+	7800 3450 8100 3450
+Wire Wire Line
+	7800 3550 8100 3550
+Wire Wire Line
+	8100 3550 8100 3450
+Connection ~ 8100 3450
+Wire Wire Line
+	7300 3850 7300 3950
+Wire Wire Line
+	7300 3950 7400 3950
+$Comp
+L rc-winch-controller-parts:RZ7889 U3
+U 1 1 6019C61D
+P 7400 3450
+F 0 "U3" H 7400 4031 50  0000 C CNN
+F 1 "RZ7889" H 7400 3940 50  0000 C CNN
+F 2 "Package_SO:SOIC-8-1EP_3.9x4.9mm_P1.27mm_EP2.29x3mm_ThermalVias" H 7400 2900 50  0001 C CNN
+F 3 "" H 7100 3800 50  0001 C CNN
+	1    7400 3450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3600 3850 4150 3850
+NoConn ~ 5550 3350
+NoConn ~ 5550 3450
+Wire Wire Line
+	5550 3250 6250 3250
+Wire Wire Line
+	6250 3250 6250 3350
+Wire Wire Line
+	6250 3350 7000 3350
+Wire Wire Line
+	6450 3250 7000 3250
+Text Label 6450 3250 0    50   ~ 0
+FWD
+Wire Wire Line
+	8650 3250 8650 3350
+Wire Wire Line
+	8650 3350 9550 3350
+Wire Wire Line
+	7900 3250 8650 3250
+Connection ~ 7900 3250
+Wire Wire Line
+	9550 3250 8850 3250
+Wire Wire Line
+	8850 3250 8850 3450
+Wire Wire Line
+	8850 3450 8100 3450
+Wire Wire Line
+	8800 5450 8400 5450
+Text Label 8400 5450 0    50   ~ 0
+LED-A
+Wire Wire Line
+	6350 5400 6350 5300
+Connection ~ 6350 5300
+Wire Wire Line
+	6350 5300 6500 5300
+Wire Wire Line
+	6050 5500 6500 5500
+Wire Wire Line
+	7000 5400 7000 5300
+Connection ~ 7000 5300
+Wire Wire Line
+	7000 5300 6900 5300
+Wire Wire Line
+	6900 5500 7450 5500
+$EndSCHEMATC
