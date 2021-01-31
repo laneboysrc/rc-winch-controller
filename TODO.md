@@ -7,7 +7,8 @@
     - Servo input 2-pos switch
     - External 3-pos switch
     - External 2-pos switch
-    - External 2-pos push-button (any difference from 2-pos switch?)
+    - External push-button (any difference from 2-pos switch?)
+    - Internal push-button
     - Light Controller protocol
 * Arming function
     * Can be disabled in the settings
@@ -41,5 +42,5 @@
         * Motor and electronics powered from servo connector
         * Motor and electronics powered from external supply
         * Motor powered from external supply, electronics powered from servo connector
-    * Feed MCU from BAT54CT! SOT-523
+    * Feed MCU from BAT54C! SOT-23
         * Motor-side use 6p connector with same jumper arrangement as on Mk4P/Mk4S

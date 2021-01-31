@@ -7,3 +7,4 @@
 *.hex
 !rc-winch-controller-servo.hex
 *.map
+*-bak

@@ -360,13 +360,13 @@ Text Label 4200 1500 0    50   ~ 0
 VDD
 Text Label 7450 5200 2    50   ~ 0
 VDD
-Text Label 6050 5400 0    50   ~ 0
-AUX-Rx-in
 Text Label 6050 5500 0    50   ~ 0
+AUX-Rx-in
+Text Label 6050 5400 0    50   ~ 0
 Tx-in
-Text Label 7450 5400 2    50   ~ 0
-AUX-Rx
 Text Label 7450 5500 2    50   ~ 0
+AUX-Rx
+Text Label 7450 5400 2    50   ~ 0
 Tx
 Wire Wire Line
 	1950 3250 1350 3250
@@ -381,7 +381,7 @@ L Device:Polyfuse F1
 U 1 1 6014AA24
 P 8650 2950
 F 0 "F1" V 8425 2950 50  0000 C CNN
-F 1 "3A 16V 1812" V 8516 2950 50  0000 C CNN
+F 1 "4A 16V 1812" V 8516 2950 50  0000 C CNN
 F 2 "Fuse:Fuse_1812_4532Metric_Pad1.30x3.40mm_HandSolder" H 8700 2750 50  0001 L CNN
 F 3 "~" H 8650 2950 50  0001 C CNN
 	1    8650 2950
