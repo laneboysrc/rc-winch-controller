@@ -5,7 +5,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
 Title "RC Winch Controller"
-Date "2021-01-24"
+Date "2021-02-11"
 Rev "Rev2"
 Comp "LANE Boys RC"
 Comment1 ""
@@ -13,17 +13,6 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
-$Comp
-L MCU_NXP_LPC:LPC812M001JDH16 U2
-U 1 1 600D3394
-P 4850 3550
-F 0 "U2" H 4950 4200 50  0000 C CNN
-F 1 "LPC812M001JDH16" H 5200 4100 50  0000 C CNN
-F 2 "Package_SO:TSSOP-16_4.4x5mm_P0.65mm" H 5800 4150 50  0001 C CNN
-F 3 "http://www.nxp.com/documents/data_sheet/LPC81XM.pdf" H 4850 3050 50  0001 C CNN
-	1    4850 3550
-	1    0    0    -1  
-$EndComp
 $Comp
 L rc-winch-controller-parts:XINLIGHT_XL-2012RGBC D2
 U 1 1 600D5353
@@ -62,7 +51,7 @@ L Regulator_Linear:MCP1703A-3302_SOT23 U1
 U 1 1 600D921C
 P 2400 1500
 F 0 "U1" H 2400 1742 50  0000 C CNN
-F 1 "MCP1703A-3302_SOT23" H 2400 1651 50  0000 C CNN
+F 1 "ME6209A33M3G" H 2400 1651 50  0000 C CNN
 F 2 "Package_TO_SOT_SMD:SOT-23W" H 2400 1700 50  0001 C CNN
 F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/20005122B.pdf" H 2400 1450 50  0001 C CNN
 	1    2400 1500
@@ -127,31 +116,6 @@ Wire Wire Line
 	6500 5200 6350 5200
 Wire Wire Line
 	6900 5200 7000 5200
-Wire Wire Line
-	4150 3250 3600 3250
-Text Label 3600 3250 0    50   ~ 0
-AUX-Rx
-Wire Wire Line
-	4150 3650 3600 3650
-Text Label 3600 3650 0    50   ~ 0
-Tx
-Wire Wire Line
-	5550 3750 6150 3750
-Text Label 6150 3750 2    50   ~ 0
-SW-ISP
-$Comp
-L power:GND #PWR07
-U 1 1 600ED009
-P 4850 4300
-F 0 "#PWR07" H 4850 4050 50  0001 C CNN
-F 1 "GND" H 4855 4127 50  0000 C CNN
-F 2 "" H 4850 4300 50  0001 C CNN
-F 3 "" H 4850 4300 50  0001 C CNN
-	1    4850 4300
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	4850 4150 4850 4300
 $Comp
 L power:GND #PWR06
 U 1 1 600ED975
@@ -173,10 +137,6 @@ Wire Wire Line
 	4800 6050 5400 6050
 Text Notes 2400 6150 0    50   ~ 0
 Special pins:\nPIO0_0  (19)   ISP UART RX\nPIO0_4  ( 5)   ISP UART TX\nPIO0_5  ( 4)   RESET\nPIO0_10 ( 9)   Open drain\nPIO0_11 ( 8)   Open drain\nPIO0_2  ( 7)   SWDIO\nPIO0_3  ( 6)   SWCLK
-Text Label 3600 3850 0    50   ~ 0
-FWD
-Text Label 5800 3250 0    50   ~ 0
-REV
 Wire Wire Line
 	7800 3250 7900 3250
 Text Label 8250 3250 0    50   ~ 0
@@ -208,7 +168,7 @@ L Device:D_Schottky_x2_KCom_AAK D1
 U 1 1 600FDC8F
 P 1750 950
 F 0 "D1" H 1750 1167 50  0000 C CNN
-F 1 "D_Schottky_x2_KCom_AAK" H 1750 1076 50  0000 C CNN
+F 1 "BAT54C" H 1750 1076 50  0000 C CNN
 F 2 "Package_TO_SOT_SMD:SOT-23" H 1750 950 50  0001 C CNN
 F 3 "~" H 1750 950 50  0001 C CNN
 	1    1750 950 
@@ -220,14 +180,10 @@ Wire Wire Line
 	1750 1500 2100 1500
 Wire Wire Line
 	2700 1500 3050 1500
-Wire Wire Line
-	4850 1500 4850 2950
 Connection ~ 3050 1500
 Wire Wire Line
 	3050 1500 3450 1500
 Connection ~ 3450 1500
-Wire Wire Line
-	3450 1500 4850 1500
 Connection ~ 1750 1500
 $Comp
 L power:GND #PWR05
@@ -344,20 +300,6 @@ Text Label 9600 5450 2    50   ~ 0
 LED-G
 Text Label 9600 5250 2    50   ~ 0
 LED-B
-NoConn ~ 5550 3550
-NoConn ~ 5550 3650
-Wire Wire Line
-	4150 3550 3600 3550
-Wire Wire Line
-	3600 3450 4150 3450
-Text Label 3600 3550 0    50   ~ 0
-LED-G
-Text Label 6150 3850 2    50   ~ 0
-LED-R
-Text Label 3600 3450 0    50   ~ 0
-LED-B
-Text Label 4200 1500 0    50   ~ 0
-VDD
 Text Label 7450 5200 2    50   ~ 0
 VDD
 Text Label 6050 5500 0    50   ~ 0
@@ -418,15 +360,7 @@ F 3 "" H 7100 3800 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	3600 3850 4150 3850
-NoConn ~ 5550 3350
-NoConn ~ 5550 3450
-Wire Wire Line
-	5550 3250 6250 3250
-Wire Wire Line
-	6250 3250 6250 3350
-Wire Wire Line
-	6250 3350 7000 3350
+	6450 3350 7000 3350
 Wire Wire Line
 	6450 3250 7000 3250
 Text Label 6450 3250 0    50   ~ 0
@@ -479,8 +413,98 @@ Wire Wire Line
 	8850 3450 8850 3350
 Wire Wire Line
 	8850 3350 9550 3350
+$Comp
+L power:+3V3 #PWR?
+U 1 1 60252048
+P 3450 1400
+F 0 "#PWR?" H 3450 1250 50  0001 C CNN
+F 1 "+3V3" H 3465 1573 50  0000 C CNN
+F 2 "" H 3450 1400 50  0001 C CNN
+F 3 "" H 3450 1400 50  0001 C CNN
+	1    3450 1400
+	1    0    0    -1  
+$EndComp
 Wire Wire Line
-	6150 3850 5550 3850
-NoConn ~ 4150 3350
-NoConn ~ 4150 3750
+	3450 1400 3450 1500
+Text Label 6450 3350 0    50   ~ 0
+REV
+$Comp
+L MCU_NXP_LPC:LPC812M101JDH20 U2
+U 1 1 60268FFA
+P 4600 3750
+F 0 "U2" H 4100 4400 50  0000 C CNN
+F 1 "LPC812M101JDH20" H 5000 4400 50  0000 C CNN
+F 2 "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm" H 5600 4450 50  0001 C CNN
+F 3 "http://www.nxp.com/documents/data_sheet/LPC81XM.pdf" H 4600 3250 50  0001 C CNN
+	1    4600 3750
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+3V3 #PWR?
+U 1 1 6026DDF4
+P 4600 2950
+F 0 "#PWR?" H 4600 2800 50  0001 C CNN
+F 1 "+3V3" H 4615 3123 50  0000 C CNN
+F 2 "" H 4600 2950 50  0001 C CNN
+F 3 "" H 4600 2950 50  0001 C CNN
+	1    4600 2950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4600 2950 4600 3050
+$Comp
+L power:GND #PWR?
+U 1 1 6026FF95
+P 4600 4550
+F 0 "#PWR?" H 4600 4300 50  0001 C CNN
+F 1 "GND" H 4605 4377 50  0000 C CNN
+F 2 "" H 4600 4550 50  0001 C CNN
+F 3 "" H 4600 4550 50  0001 C CNN
+	1    4600 4550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4600 4450 4600 4550
+Wire Wire Line
+	3900 3350 3350 3350
+Text Label 3350 3350 0    50   ~ 0
+AUX-Rx
+Wire Wire Line
+	3900 3750 3350 3750
+Text Label 3350 3750 0    50   ~ 0
+Tx
+Text Label 3350 3950 0    50   ~ 0
+FWD
+Wire Wire Line
+	3900 3650 3350 3650
+Wire Wire Line
+	3350 3550 3900 3550
+Text Label 3350 3650 0    50   ~ 0
+LED-G
+Text Label 3350 3550 0    50   ~ 0
+LED-B
+Wire Wire Line
+	3350 3950 3900 3950
+Text Label 3350 4050 0    50   ~ 0
+REV
+Wire Wire Line
+	3900 4050 3350 4050
+NoConn ~ 3900 3450
+NoConn ~ 3900 3850
+NoConn ~ 3900 4150
+Wire Wire Line
+	5300 3650 5800 3650
+Text Label 5800 3650 2    50   ~ 0
+SW-ISP
+Text Label 5800 3750 2    50   ~ 0
+LED-R
+Wire Wire Line
+	5800 3750 5300 3750
+NoConn ~ 5300 3350
+NoConn ~ 5300 3450
+NoConn ~ 5300 3550
+NoConn ~ 5300 3850
+NoConn ~ 5300 3950
+NoConn ~ 5300 4050
+NoConn ~ 5300 4150
 $EndSCHEMATC
