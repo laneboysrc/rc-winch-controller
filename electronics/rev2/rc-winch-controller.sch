@@ -112,10 +112,6 @@ F 3 "~" H 9750 3150 50  0001 C CNN
 	1    9750 3150
 	1    0    0    1   
 $EndComp
-Wire Wire Line
-	6500 5200 6350 5200
-Wire Wire Line
-	6900 5200 7000 5200
 $Comp
 L power:GND #PWR06
 U 1 1 600ED975
@@ -286,7 +282,7 @@ Wire Wire Line
 Connection ~ 7400 3950
 Wire Wire Line
 	7400 3950 7400 4050
-Text Label 6050 5200 0    50   ~ 0
+Text Label 7450 5200 2    50   ~ 0
 LED-A
 Wire Wire Line
 	9200 5650 9600 5650
@@ -300,8 +296,6 @@ Text Label 9600 5450 2    50   ~ 0
 LED-G
 Text Label 9600 5250 2    50   ~ 0
 LED-B
-Text Label 7450 5200 2    50   ~ 0
-VDD
 Text Label 6050 5500 0    50   ~ 0
 AUX-Rx-in
 Text Label 6050 5400 0    50   ~ 0
@@ -331,8 +325,8 @@ F 3 "~" H 8650 2950 50  0001 C CNN
 $EndComp
 Text Label 9150 2950 0    50   ~ 0
 VMOT-in
-Text Notes 5800 5750 0    50   ~ 0
-2x 1k in parallel to get detect LED current
+Text Notes 6500 6250 0    50   ~ 0
+Testing showed that 1k is enough for green and red.\nIt is a bit dim for blue, but still usable.\nAt 500R (2x 1k in parallel) red and green are already\ntoo bright.
 Wire Wire Line
 	7800 3350 7900 3350
 Wire Wire Line
@@ -373,11 +367,7 @@ Wire Wire Line
 Text Label 8400 5450 0    50   ~ 0
 LED-A
 Wire Wire Line
-	6350 5300 6500 5300
-Wire Wire Line
 	6050 5500 6500 5500
-Wire Wire Line
-	7000 5300 6900 5300
 Wire Wire Line
 	6900 5500 7450 5500
 Wire Wire Line
@@ -394,17 +384,7 @@ Wire Wire Line
 Text Notes 850  4050 0    50   ~ 0
 Pin 5+6 to connect 100uF/16V polymer
 Wire Wire Line
-	6350 5200 6350 5300
-Connection ~ 6350 5200
-Wire Wire Line
-	6350 5200 6050 5200
-Wire Wire Line
 	6050 5400 6500 5400
-Wire Wire Line
-	7000 5300 7000 5200
-Connection ~ 7000 5200
-Wire Wire Line
-	7000 5200 7450 5200
 Wire Wire Line
 	6900 5400 7450 5400
 Wire Wire Line
@@ -414,10 +394,10 @@ Wire Wire Line
 Wire Wire Line
 	8850 3350 9550 3350
 $Comp
-L power:+3V3 #PWR?
+L power:+3V3 #PWR0101
 U 1 1 60252048
 P 3450 1400
-F 0 "#PWR?" H 3450 1250 50  0001 C CNN
+F 0 "#PWR0101" H 3450 1250 50  0001 C CNN
 F 1 "+3V3" H 3465 1573 50  0000 C CNN
 F 2 "" H 3450 1400 50  0001 C CNN
 F 3 "" H 3450 1400 50  0001 C CNN
@@ -440,10 +420,10 @@ F 3 "http://www.nxp.com/documents/data_sheet/LPC81XM.pdf" H 4600 3250 50  0001 C
 	1    0    0    -1  
 $EndComp
 $Comp
-L power:+3V3 #PWR?
+L power:+3V3 #PWR0102
 U 1 1 6026DDF4
 P 4600 2950
-F 0 "#PWR?" H 4600 2800 50  0001 C CNN
+F 0 "#PWR0102" H 4600 2800 50  0001 C CNN
 F 1 "+3V3" H 4615 3123 50  0000 C CNN
 F 2 "" H 4600 2950 50  0001 C CNN
 F 3 "" H 4600 2950 50  0001 C CNN
@@ -453,10 +433,10 @@ $EndComp
 Wire Wire Line
 	4600 2950 4600 3050
 $Comp
-L power:GND #PWR?
+L power:GND #PWR0103
 U 1 1 6026FF95
 P 4600 4550
-F 0 "#PWR?" H 4600 4300 50  0001 C CNN
+F 0 "#PWR0103" H 4600 4300 50  0001 C CNN
 F 1 "GND" H 4605 4377 50  0000 C CNN
 F 2 "" H 4600 4550 50  0001 C CNN
 F 3 "" H 4600 4550 50  0001 C CNN
@@ -477,11 +457,9 @@ Text Label 3350 3950 0    50   ~ 0
 FWD
 Wire Wire Line
 	3900 3650 3350 3650
-Wire Wire Line
-	3350 3550 3900 3550
-Text Label 3350 3650 0    50   ~ 0
+Text Label 5800 4150 2    50   ~ 0
 LED-G
-Text Label 3350 3550 0    50   ~ 0
+Text Label 5800 3750 2    50   ~ 0
 LED-B
 Wire Wire Line
 	3350 3950 3900 3950
@@ -496,7 +474,7 @@ Wire Wire Line
 	5300 3650 5800 3650
 Text Label 5800 3650 2    50   ~ 0
 SW-ISP
-Text Label 5800 3750 2    50   ~ 0
+Text Label 3350 3650 0    50   ~ 0
 LED-R
 Wire Wire Line
 	5800 3750 5300 3750
@@ -506,5 +484,99 @@ NoConn ~ 5300 3550
 NoConn ~ 5300 3850
 NoConn ~ 5300 3950
 NoConn ~ 5300 4050
-NoConn ~ 5300 4150
+Wire Wire Line
+	6050 5200 6500 5200
+Wire Wire Line
+	6900 5200 7450 5200
+NoConn ~ 6900 5300
+NoConn ~ 6500 5300
+$Comp
+L power:+3V3 #PWR0104
+U 1 1 602765C7
+P 6050 5100
+F 0 "#PWR0104" H 6050 4950 50  0001 C CNN
+F 1 "+3V3" H 6065 5273 50  0000 C CNN
+F 2 "" H 6050 5100 50  0001 C CNN
+F 3 "" H 6050 5100 50  0001 C CNN
+	1    6050 5100
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:PWR_FLAG #FLG0101
+U 1 1 6027C6ED
+P 1000 4800
+F 0 "#FLG0101" H 1000 4875 50  0001 C CNN
+F 1 "PWR_FLAG" H 1000 4973 50  0000 C CNN
+F 2 "" H 1000 4800 50  0001 C CNN
+F 3 "~" H 1000 4800 50  0001 C CNN
+	1    1000 4800
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:PWR_FLAG #FLG0102
+U 1 1 6027C935
+P 1000 5150
+F 0 "#FLG0102" H 1000 5225 50  0001 C CNN
+F 1 "PWR_FLAG" H 1000 5323 50  0000 C CNN
+F 2 "" H 1000 5150 50  0001 C CNN
+F 3 "~" H 1000 5150 50  0001 C CNN
+	1    1000 5150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1000 4800 1000 4850
+Wire Wire Line
+	1000 4850 1600 4850
+Wire Wire Line
+	1000 5150 1000 5250
+Wire Wire Line
+	1000 5250 1600 5250
+Text Label 1600 4850 2    50   ~ 0
+VIN
+Text Label 1600 5250 2    50   ~ 0
+VMOT
+$Comp
+L power:GND #PWR0105
+U 1 1 602850D6
+P 1000 5550
+F 0 "#PWR0105" H 1000 5300 50  0001 C CNN
+F 1 "GND" H 1005 5377 50  0000 C CNN
+F 2 "" H 1000 5550 50  0001 C CNN
+F 3 "" H 1000 5550 50  0001 C CNN
+	1    1000 5550
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:PWR_FLAG #FLG0103
+U 1 1 602853CA
+P 1000 5500
+F 0 "#FLG0103" H 1000 5575 50  0001 C CNN
+F 1 "PWR_FLAG" H 1000 5673 50  0000 C CNN
+F 2 "" H 1000 5500 50  0001 C CNN
+F 3 "~" H 1000 5500 50  0001 C CNN
+	1    1000 5500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1000 5500 1000 5550
+$Comp
+L power:PWR_FLAG #FLG0104
+U 1 1 6028AC6C
+P 1450 1450
+F 0 "#FLG0104" H 1450 1525 50  0001 C CNN
+F 1 "PWR_FLAG" H 1450 1623 50  0000 C CNN
+F 2 "" H 1450 1450 50  0001 C CNN
+F 3 "~" H 1450 1450 50  0001 C CNN
+	1    1450 1450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1450 1450 1450 1500
+Wire Wire Line
+	1450 1500 1750 1500
+Wire Wire Line
+	5800 4150 5300 4150
+NoConn ~ 3900 3550
+Wire Wire Line
+	6050 5100 6050 5200
 $EndSCHEMATC
